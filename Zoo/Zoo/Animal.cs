@@ -5,6 +5,7 @@ using System.Text;
 namespace Zoo
 {
     public enum AnimalType { tiger, elephant, fox, horse, lion, cattle }
+
     public class Animal
     {
         public int Type { get; set; }
@@ -31,6 +32,7 @@ namespace Zoo
             IsItDangerous = true;
             EnabledFood = new List<string>();
             EnabledFood.Add("meat");
+            EnabledFood.Add("water");
         }
 
     }
@@ -47,7 +49,7 @@ namespace Zoo
             IsItDangerous = false;
             EnabledFood = new List<string>();
             EnabledFood.Add("petFood");
-            EnabledFood.Add("plant");
+            EnabledFood.Add("water");
         }
     }
     public class Fox : Animal
@@ -60,7 +62,8 @@ namespace Zoo
             IsItDangerous = false;
             EnabledFood = new List<string>();
             EnabledFood.Add("meat");
-        } 
+            EnabledFood.Add("water");
+        }
     }
     public class Horse : Animal
     {
@@ -72,10 +75,10 @@ namespace Zoo
             IsItDangerous = false;
             EnabledFood = new List<string>();
             EnabledFood.Add("petFood");
-            EnabledFood.Add("plant");
+            EnabledFood.Add("water");
         }
-    
-    
+
+
     }
     public class Lion : Animal
     {
@@ -90,6 +93,7 @@ namespace Zoo
             IsItDangerous = true;
             EnabledFood = new List<string>();
             EnabledFood.Add("meat");
+            EnabledFood.Add("water");
         }
     }
     public class Cattle : Animal
@@ -102,7 +106,7 @@ namespace Zoo
             IsItDangerous = false;
             EnabledFood = new List<string>();
             EnabledFood.Add("petFood");
-            EnabledFood.Add("plant");
+            EnabledFood.Add("water");
         }
     }
 

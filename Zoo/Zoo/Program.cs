@@ -3,27 +3,59 @@ using System.Collections.Generic;
 
 namespace Zoo
 {
-   public class Program
+    public class Program
     {
+        public static ZooKeeper Z;
+        public static bool simulateON;
+        public static List<string> AllFood;
         private static readonly Random random = new Random();
 
         static void Main(string[] args)
         {
+            Z = new ZooKeeper();
+            Z.ActualFood = new Food();
+            simulateON = true;
+            AllFood = new List<string>() { "Water", "Meat", "petfood" };
             Random R = new Random();
-            ZooKeeper Z = new ZooKeeper();
             List<Animal> ZooAnimals = new List<Animal>();
+
+            GenerateZoo(ZooAnimals);
+
             List<Animal> NotDangerousAnimals = NotDangerous(ZooAnimals);
             List<Animal> DangerousAnimals = Dangerous(ZooAnimals);
-            GenerateZoo(ZooAnimals);
+
             Console.WriteLine("Itt az ideje az állatok etetésének és itatásának");
             Console.WriteLine("--------------------------------------------------------------");
-            Z.ActualFood = "Water";
-            Z.Amount = R.Next(0, 11);
+
             Console.WriteLine("Kezdjük azokkal, akik nem veszélyesek");
-            Console.WriteLine("Szállított tápanyag: " + Z.ActualFood);
-            Console.WriteLine("Szállított mennyiség: " + Z.Amount);
 
-
+            while (simulateON)
+            {
+                Z.ActualFood.Type = AllFood[R.Next(0, 3)].ToUpper();
+                Z.Amount = R.Next(1, 2);
+                Console.WriteLine("Szállított tápanyag: " + Z.ActualFood.Type);
+                Console.WriteLine("Szállított mennyiség: " + Z.Amount);              
+                IncreaseWaterFood(NotDangerousAnimals);
+                if (simulateON)
+                {
+                    Z.ActualFood.Type = AllFood[R.Next(0, 3)].ToUpper();
+                    Z.Amount = R.Next(1, 2);
+                 
+                    Console.WriteLine("A nem veszélyes állatok etetése sikeres volt!");
+                    Console.WriteLine("-------------------------------------------");
+                    Console.WriteLine("Következik a veszélyes állatok etetése!");
+                    Console.WriteLine("--------------------------------------------");
+                    Console.WriteLine("Szállított tápanyag: " + Z.ActualFood.Type);
+                    Console.WriteLine("Szállított mennyiség: " + Z.Amount);
+                    IncreaseWaterFood(DangerousAnimals);
+                    if (simulateON)
+                    {
+                        Console.WriteLine("A veszélyes állatok etetése sikeres volt!");
+                        Console.WriteLine("-------------------------------------------");
+                    }
+                }
+            }
+            
             Console.ReadLine();
         }
         private static double RandomNumberBetween(double minValue, double maxValue)
@@ -53,7 +85,7 @@ namespace Zoo
             number = R.Next(0, 10);
             for (int i = 0; i < number; i++)
             {
-                Animals.Add(new Elephant() { Name = "Fox" + i, ActualWater = -1, ActualFood = RandomNumberBetween(0.5,1) });
+                Animals.Add(new Elephant() { Name = "Fox" + i, ActualWater = -1, ActualFood = RandomNumberBetween(0.5, 1) });
             }
 
             //Horses
@@ -66,7 +98,7 @@ namespace Zoo
             number = R.Next(0, 10);
             for (int i = 0; i < number; i++)
             {
-                Animals.Add(new Lion() { Name = "Lion" + i, ActualWater = RandomNumberBetween(1,1.5), ActualFood = R.Next(25, 30) });
+                Animals.Add(new Lion() { Name = "Lion" + i, ActualWater = RandomNumberBetween(1, 1.5), ActualFood = R.Next(25, 30) });
             }
 
             //Cattle
@@ -89,7 +121,7 @@ namespace Zoo
                     notDangerous.Add(animal);
                 }
             }
-            return Animals;
+            return notDangerous;
         }
         public static List<Animal> Dangerous(List<Animal> Animals)
         {
@@ -98,12 +130,81 @@ namespace Zoo
             {
                 if (animal.IsItDangerous)
                 {
-                    notDangerous.Add(animal);
+                    Dangerous.Add(animal);
                 }
             }
-            return Animals;
+            return Dangerous;
         }
+        public static bool FoodIsOk(Animal a, string food)
+        {
+            List<string> EnabledFood = new List<string>();
+            foreach (var item in a.EnabledFood)
+            {
+                EnabledFood.Add(item.ToUpper());
+            }
+            if (EnabledFood.Contains(food.ToUpper()))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static void ListStatistic(List<Animal> Animals)
+        {
+            Console.WriteLine("Az állatok jelenlegi statisztikája: ");
+            Console.WriteLine("--------------------------------------------");
+            foreach (var animal in Animals)
+            {
+                Console.WriteLine(animal.Name + " " + "Aktuális / MaxVíz " + animal.ActualWater + " / " +animal.MaxWaterPerDay);
+                Console.WriteLine("Aktuális / MaxFood " + animal.ActualFood + " / " + animal.MaxFoodPerDay);
+                Console.WriteLine("--------------------------------------------");
+            }
+        }
+
+        public static void IncreaseWaterFood(List<Animal> Animals)
+        {
+            foreach (var animal in Animals)
+            {
+                if (FoodIsOk(animal, Z.ActualFood.Type))
+                {
+                    if (Z.ActualFood.Type == "Water".ToUpper() && simulateON)
+                    {
+                        animal.ActualWater += Z.Amount;
+                        if (animal.ActualWater > animal.MaxWaterPerDay)
+                        {
+                            simulateON = false;
+                            Console.WriteLine("Sajnos " + animal.Name + " túlitatás miatt elpusztult");
+                            break;
+                        }
+                    }
+                    else if(Z.ActualFood.Type == "Meat".ToUpper() &&simulateON)
+                    {
+                        animal.ActualFood += Z.Amount;
+                        if (animal.ActualFood > animal.MaxFoodPerDay)
+                        {
+                            simulateON = false;
+                            Console.WriteLine("Sajnos " + animal.Name + " túletetés miatt elpusztult");
+                            break;
+
+                        }
+                    }
+                    else if (Z.ActualFood.Type == "petfood".ToUpper() && simulateON)
+                    {
+                        animal.ActualFood += Z.Amount;
+                        if (animal.ActualFood > animal.MaxFoodPerDay)
+                        {
+                            simulateON = false;
+                            Console.WriteLine("Sajnos " + animal.Name + " túletetés miatt elpusztult");
+                            break;
+
+                        }
+                    }
+                }           
+            }
+        }
+
+
     }
 
-    
+
 }
